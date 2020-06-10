@@ -31,6 +31,7 @@ public class NIOServer {
         serverSocketChannel.configureBlocking(false);
         // 把serverSocketChannel注册到selector，关心事件为OP_ACCEPT 此处为注册服务端Channel
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("服务端channel注册后，selector中SelectionKey的个数为：" + selector.keys().size());
 
         // 循环等待客户端连接
         while (true) {
@@ -53,6 +54,7 @@ public class NIOServer {
                     socketChannel.configureBlocking(false);
                     // 将socketChannel注册到selector，关注事件为OP_READ，同时给socketChannel关联一个Buffer 此处为注册客户端Channel
                     socketChannel.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(1024));
+                    System.out.println("客户端连接后，selector中SelectionKey的个数为：" + selector.keys().size());
                 }
                 if (selectionKey.isReadable()) {// 发生OP_READ
                     SocketChannel channel = (SocketChannel) selectionKey.channel();
