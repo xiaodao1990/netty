@@ -38,6 +38,7 @@ public class GroupChatServer {
     }
 
     public  void listen() {
+        System.out.println("当前服务器的监听线程为："+Thread.currentThread().getName());
         try {
             while (true) {
                 int count = selector.select(2000);
@@ -96,6 +97,7 @@ public class GroupChatServer {
     }
 
     private void sendInfoToOtherClient(String msg, SocketChannel self) throws IOException {
+        System.out.println("当前服务器的处理线程为："+Thread.currentThread().getName());
         System.out.println("服务器转发消息中。。。");
         // 便利所有注册到selector上的SocketChannel，并排除self
         for (SelectionKey selectionKey : selector.keys()) {
