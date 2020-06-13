@@ -126,3 +126,62 @@ public class ChannelInboundHandlerAdapter extends ChannelHandlerAdapter implemen
     }
 }
 ```
+### Pipeline和ChannelPipeline
+```text
+1) ChannelPipeline 是一个 Handler 的集合，它负责处理和拦截inbound或者outbound的事件和操作，
+相当于一个贯穿Netty的链。(也可以这样理解：ChannelPipeline是保存ChannelHandler的List，用于处
+理或拦截Channel的入站事件和出站操作)。
+2) ChannelPipeline实现了一种高级形式的拦截过滤器模式，使用户可以完全控制事件的处理方式，以及
+Channel中各个的ChannelHandler如何相互交互。
+3) 在Netty中每个Channel都有且仅有一个ChannelPipeline与之对应，它们的组成关系如下
+```
+![avatar](./pic/025_netty.png)
+```text
+    一个Channel包含了一个ChannelPipeline(Channel与ChannelPipeline一对一关系)
+    ChannelPipeline中维护了一个由ChannelHandlerContext组成的双向链表，并且每个ChannelHandlerContext 中
+    又关联着一个ChannelHandler(ChannelHandlerContext与ChannelHandler是一对一关系，ChannelPipeline与ChannelHandlerContext是一对多关系)
+    
+    入站事件和出站事件在一个双向链表中，入站事件会从链表 head 往后传递到最后一个入站的 handler，出站事件会从链表tail往前
+    传递到最前一个出站的 handler，两种类型的 handler 互不干扰
+常见方法：
+    // 把一个业务处理类(Handler)添加到链中的第一个位置
+    ChannelPipeline addFirst(ChannelHandler... handlers)
+    // 把一个业务处理类(Handler)添加到链中的最后一个位置
+    ChannelPipeline addLast(ChannelHandler... handlers)
+```
+### ChannelHandlerContext
+```text
+1) 保存Channel相关的所有上下文信息，同时关联一个ChannelHandler对象。
+2) 即ChannelHandlerContext中包含一个具体的事件处理器ChannelHandler，同时ChannelHandlerContext
+中也绑定了对应的pipeline和Channel的信息，方便对ChannelHandler进行调用。
+3) 常用的方法
+    ChannelFuture close()，关闭通道
+    ChannelOutboundInvoker flush()，刷新
+    ChannelFuture writeAndFlush(Object msg) ， 将数据写到ChannelPipeline中当前ChannelHandler
+    的下一个ChannelHandler开始处理(出站)
+```
+### ChannelOption
+```text
+1) Netty 在创建Channel实例后,一般都需要设置ChannelOption参数。
+2) ChannelOption 参数如下:
+    ChannelOption.SO_BACKLOG：对应 TCP/IP 协议 listen 函数中的 backlog 参数，用来初始化服务器可连接队列大小。服务端处理
+    客户端连接请求是顺序处理的，所以同一时间只能处理一个客户端连接。多个客户端来的时候，服务端将不能处理的客户端连接请求
+    放在队列中等待处理，backlog 参数指定了队列的大小。
+    ChannelOption.SO_KEEPALIVE：一直保持连接活动状态。  
+```
+### EventLoopGroup 和其实现类 NioEventLoopGroup
+```text
+1) EventLoopGroup是一组EventLoop的抽象，Netty为了更好的利用多核CPU资源，一般会有多个EventLoop同时工作，每个EventLoop维护
+着一个Selector实例。
+2) EventLoopGroup 提供next接口，可以从组里面按照一定规则获取其中一个EventLoop来处理任务。在Netty服务器端编程中，我们一般
+都需要提供两个EventLoopGroup，例如：BossEventLoopGroup和WorkerEventLoopGroup。
+3) 通常一个服务端口即一个 ServerSocketChannel对应一个Selector和一个EventLoop线程。BossEventLoop负责接收客户端的连接并将
+SocketChannel交给WorkerEventLoopGroup来进行 IO 处理，如下图所示
+    BossEventLoopGroup通常是一个单线程的EventLoop，EventLoop维护着一个注册了ServerSocketChannel的Selector实例
+    BossEventLoop不断轮询Selector将连接事件分离出来。
+    
+    通常是OP_ACCEPT事件，然后将接收到的SocketChannel交给WorkerEventLoopGroup
+    
+    WorkerEventLoopGroup会由next选择其中一个EventLoop来将这个SocketChannel注册到其维护的Selector并对其后续的IO事件进行处理
+```
+![avatar](./pic/026_netty.png)
