@@ -185,3 +185,8 @@ SocketChannel交给WorkerEventLoopGroup来进行 IO 处理，如下图所示
     WorkerEventLoopGroup会由next选择其中一个EventLoop来将这个SocketChannel注册到其维护的Selector并对其后续的IO事件进行处理
 ```
 ![avatar](./pic/026_netty.png)
+```text
+4) 相关方法    
+    public NioEventLoopGroup()，构造方法
+    public Future<?> shutdownGracefully()，断开连接，关闭线程
+```
