@@ -30,6 +30,7 @@ public class HeartServerHandler extends ChannelInboundHandlerAdapter {
             System.out.println(ctx.channel().remoteAddress()+"-----超时事件--"+eventType);
             System.out.println("服务器做出相应的处理");
             // 如果发生空闲，我们就关闭通道
+            // ctx.channel().close();
         }
     }
 }
