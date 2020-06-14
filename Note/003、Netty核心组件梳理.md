@@ -190,3 +190,16 @@ SocketChannel交给WorkerEventLoopGroup来进行 IO 处理，如下图所示
     public NioEventLoopGroup()，构造方法
     public Future<?> shutdownGracefully()，断开连接，关闭线程
 ```
+### UnPooled
+```text
+1) Netty提供一个专门用来操作缓冲区(即Netty的数据容器)的工具类
+2) 常见的方法如下    
+    // 通过给定的数据和字符编码返回一个ByteBuf对象
+    public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
+3) 举例说明Unpooled 获取 Netty的数据容器ByteBuf 的基本使用 [案例演示]    
+    通过readerIndex和writerIndex和capacity，将buffer分成三个区域。
+    0-readerIndex 已经读取的区域
+    readerIndex-writerIndex 可读的区域
+    writerIndex-capacity 可写的区域
+```
+![avatar](./pic/027_netty.png)
