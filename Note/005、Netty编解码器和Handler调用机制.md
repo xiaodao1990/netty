@@ -10,3 +10,58 @@ ChannelOutboundHandler原理一样，只不过它是用来处理出站数据的�
 ChannelOutboundHandler，并被这些Handler处理，反之则称为入站。
 ```
 ![avatar](./pic/032_netty.png)
+
+### 根据codec包理解
+```text
+客户端-->ProtobufEncoder-->MessageToMessageEncoder-->ChannelOutboundHandlerAdapter (出站)
+服务器端<--ChannelInboundHandlerAdapter<--MessageToMessageDecoder<--ProtobufDecoder (入站)
+```
+
+### 编码解码器
+```text
+1) 当Netty发送或者接收一个消息的时候，就将会发生一次数据转换。入站消息会被解码：从字节转换为另一种
+格式(比如java对象); 如果是出站消息，它会被编码成字节。
+2) Netty提供一些列实用的编解码器，他们都实现了ChannelInboundHandler或者ChannelOutboundHandler接口。
+在这些类中，channelRead方法已经被重写了。以入站为例，对于每个从入站Channel读取的消息，这个方法会被
+调用。随后，它将调用由解码器所提供的decode()方法进行解码，并将已经解码的字节转换成ChannelPipeline中
+的下一个ChannelInboundHandler。
+
+解码是In，编码是Out
+```
+### 解码器-ByteToMessageDecoder
+![avatar](./pic/033_netty.png)
+```text
+1) 关系继承图(见上图)
+2) 由于不可能知道远程节点是否会一次性发送一个完整的信息，tcp有可能出现粘包拆包的问题，这个类会对入站数据
+进行缓冲，直到它准备好被处理。
+3) 一个关于ByteToMessageDecoder实例分析
+public class ToIntegerDecoder extends ByteToMessageDecoder {
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (in.readableBytes() >= 4) {
+            out.add(in.readInt());
+        }
+    }
+}
+说明：这个例子，每次入站从ButeBuf中读取4字节，将其解码为一个int，然后将它添加到下一个List中(decode会被多次调用)。当没有更多
+元素可以被添加到该List中时，它的内容将会被发送给下一个ChannelInboundHandler，int在被添加到List中时，会被自动装箱为integer。
+在调用readInt()方法前必须验证所输入的Bytebuf是否具有足够的数据。
+2) decode执行分析图
+```
+![avatar](./pic/034_netty.png)
+
+### Netty的Handler链的调用机制
+```text
+案例说明：
+1) 使用自定义的编码器和解码器来说明Netty的handler 调用机制
+    客户端发送long -> 服务器服务端发送long -> 客户端
+2) 结论：
+    不论解码器Handler还是编码器Handler，接收的消息类型必须与待处理的消息类型一致，否则该Handler不会被执行。
+    在解码器进行数据解码时，需要判断缓存去(Bytebuf)的数据是否足够，否则接收到的结果会跟期望的结果不一致。
+
+```
+![avatar](./pic/035_netty.png)
+![avatar](./pic/036_netty.png)
+![avatar](./pic/037_netty.png)    
+![avatar](./pic/038_netty.png)    
+![avatar](./pic/039_netty.png)        
