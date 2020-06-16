@@ -65,3 +65,15 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
 ![avatar](./pic/037_netty.png)    
 ![avatar](./pic/038_netty.png)    
 ![avatar](./pic/039_netty.png)        
+
+### 其它解码器
+```text
+1、ReplayingDecoder
+    1) public abstract class ReplayingDecoder<S> extends ByteToMessageDecoder
+    2) ReplayingDecoder扩展了ByteToMessageDecoder类，使用这个类，我们不必调用readableBytes()方法。参数S指定了
+    用户状态管理的类型，其中Void代表不需要状态管理。
+2、LineBasedFrameDecoder：这个类在Netty内部也有使用，它使用行尾控制字符（\n或者\r\n）作为分隔符来解析数据。
+3、DelimiterBasedFrameDecoder：使用自定义的特殊字符作为消息的分隔符。
+4、HttpObjectDecoder：一个HTTP数据的解码器。
+5、LengthFieldBasedFrameDecoder：通过指定长度来标识整包消息，这样就可以自动的处理黏包和半包消息。
+```
