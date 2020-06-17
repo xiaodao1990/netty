@@ -70,7 +70,70 @@ ServerBootstrap.bind(PORT)
                 -->doBind(localAddress);
                     -->initAndRegister();
                         -->channel = channelFactory.newChannel();// channelFactory为ServerBootstrap.channel(NioServerSocketChannel.class)中初始化的ReflectiveChannelFactory
+                            // 通过ServerBootstrap的通道工厂反射创建一个NioServerSocketChannel
                             -->clazz.getConstructor().newInstance();// 实例化NioServerSocketChannel
+                                -->NioServerSocketChannel()
+                                    -->newSocket(DEFAULT_SELECTOR_PROVIDER);
+                                        -->provider.openServerSocketChannel();// provider=WindowsSelectorProvider
+                                            -->SelectorProviderImpl.openServerSocketChannel()
+                                                -->new ServerSocketChannelImpl(this);
+                                                    -->ServerSocketChannel(SelectorProvider provider)
+                                                    -->AbstractSelectableChannel(SelectorProvider provider)
+                                                        -->this.provider = provider;
+                                    -->this(newSocket(DEFAULT_SELECTOR_PROVIDER));
+                                        -->NioServerSocketChannel(ServerSocketChannel channel)// channel=ServerSocketChannelImpl
+                                            -->AbstractNioMessageChannel(Channel parent, SelectableChannel ch, int readInterestOp)
+                                            -->AbstractNioChannel(Channel parent, SelectableChannel ch, int readInterestOp)
+                                            -->AbstractChannel(Channel parent)
+                                                -->id = newId();// id=ChannelId DefaultChannelId - Dio.netty.machineId: 00:28:f8:ff:fe:78:56:c7 (auto-detected)
+                                                -->unsafe = newUnsafe();
+                                                    -->new NioMessageUnsafe();// 主要作用为初始化调用链上的成员变量
+                                                        -->AbstractUnsafe()
+                                                        -->AbstractNioUnsafe()
+                                                        -->NioMessageUnsafe()// 用于操作消息。
+                                                -->pipeline = newChannelPipeline();
+                                                    // 创建一个DefaultChannelPipeline管道，是一个双向链表结构，用于过滤所有进出的消息
+                                                    -->new DefaultChannelPipeline(this);
+                                                        protected DefaultChannelPipeline(Channel channel) {
+                                                            this.channel = ObjectUtil.checkNotNull(channel, "channel");
+                                                            succeededFuture = new SucceededChannelFuture(channel, null);
+                                                            voidPromise =  new VoidChannelPromise(channel, true);
+                                                    
+                                                            tail = new TailContext(this);
+                                                            head = new HeadContext(this);
+                                                    
+                                                            head.next = tail;
+                                                            tail.prev = head;
+                                                        }
+                                        // 创建一个NioServerSocketChannelConfig对象，用于对外展示一些配置
+                                        -->config = new NioServerSocketChannelConfig(this, javaChannel().socket());
                         -->init(channel);
                             -->ServerBootstrap.init(Channel channel)
+                                -->ChannelPipeline p = channel.pipeline();
+                                -->p.addLast(new ChannelInitializer<Channel>())
+                                    -->addLast(null, handlers);// DefaultChannelPipeline
+                                        -->addLast(EventExecutorGroup executor, ChannelHandler... handlers)// DefaultChannelPipeline
+                                            -->addLast(executor, null, h);
+                                                -->addLast(EventExecutorGroup group, String name, ChannelHandler handler)// DefaultChannelPipeline
+                                                    // 创建一个AbstractChannelHandlerContext
+                                                    -->newCtx = newContext(group, filterName(name, handler), handler);
+                                                    -->addLast0(newCtx);// 将新Handler添加到链表tail前面。
+                                                    private void addLast0(AbstractChannelHandlerContext newCtx) {
+                                                        AbstractChannelHandlerContext prev = tail.prev;
+                                                        newCtx.prev = prev;
+                                                        newCtx.next = tail;
+                                                        prev.next = newCtx;
+                                                        tail.prev = newCtx;
+                                                    }
+                        -->config().group()// config()=ServerBootstrapConfig      
+                            -->AbstractBootstrapConfig.group()
+                                -->bootstrap.group();// bootstrap=ServerBootstrap; group()=NioEventLoopGroup
+                        // 通过ServerBootstrap的bossGroup注册NioServerSocketChannel
+                        -->NioEventLoopGroup.register(channel);// channel=NioServerSocketChannel  
+                            -->next()// NioEventLoop
+                            -->next().register(channel);  
+                                -->register(Channel channel)// SingleThreadEventLoop
+                        // 最后返回这个异步执行的占位符regFuture       
+                        -->return regFuture;   
+                    -->doBind0(regFuture, channel, localAddress, promise);
 ```
