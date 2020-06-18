@@ -1,4 +1,4 @@
-### Netty服务启动源码剖析
+### Netty服务启动源码剖析 参考https://www.cnblogs.com/xiangnan6122/p/10202257.html[源码解析系列文章]
 ```text
 // 此处1表示bossGroup事件组有一个线程
 EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -136,4 +136,61 @@ ServerBootstrap.bind(PORT)
                         // 最后返回这个异步执行的占位符regFuture       
                         -->return regFuture;   
                     -->doBind0(regFuture, channel, localAddress, promise);
+                        -->channel.bind(localAddress, promise)// NioServerSocketChannel
+                            --> bind(SocketAddress localAddress, ChannelPromise promise)//AbstractChannel
+                                -->pipeline.bind(localAddress, promise);// pipeline=DefaultChannelPipeline
+                                    -->tail.bind(localAddress, promise);
+                                        -->bind(final SocketAddress localAddress, final ChannelPromise promise)// AbstractChannelHandlerContext
+                                            -->next.invokeBind(localAddress, promise);// DefaultChannelHandlerContext
+                                                -->invokeBind(SocketAddress localAddress, ChannelPromise promise)// AbstractChannelHandlerContext
+                                                    -->((ChannelOutboundHandler) handler()).bind(this, localAddress, promise);
+                                                        -->bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)//LoggingHandler
+                                                            -->ctx.bind(localAddress, promise);// DefaultChannelHandlerContext
+                                                                -->bind(final SocketAddress localAddress, final ChannelPromise promise)// AbstractChannelHandlerContext
+                                                                    -->next.invokeBind(localAddress, promise);// next=DefaultChannelHandlerContext$HeadContext
+                                                                        -->invokeBind(SocketAddress localAddress, ChannelPromise promise)// AbstractChannelHandlerContext
+                                                                            -->((ChannelOutboundHandler) handler()).bind(this, localAddress, promise);// DefaultChannelPipeline$HeadContext
+                                                                                -->unsafe.bind(localAddress, promise);// AbstractChannel$AbstractUnsafe
+                                                                                    -->doBind(localAddress);
+                                                                                        // jdk底层的channel绑定端口的逻辑
+                                                                                        -->javaChannel().bind(localAddress, config.getBacklog());
+                                                                                -->pipeline.fireChannelActive();// pipeline=DefaultChannelPipeline传输active事件 
+                                                                                    -->AbstractChannelHandlerContext.invokeChannelActive(head);
+                                                                                        -->next.invokeChannelActive();// DefaultChannelPipeline$HeadContext
+                                                                                            -->((ChannelInboundHandler) handler()).channelActive(this);
+                                                                                                -->readIfIsAutoRead();
+                                                                                                    -->channel.read();// channel=NioServerSocketChannel
+                                                                                                        -->pipeline.read();// pipeline=DefaultChannelPipeline
+                                                                                                            -->tail.read();
+                                                                                                                -->next.invokeRead();
+                                                                                                                    -->((ChannelOutboundHandler) handler()).read(this);// LoggingHandler
+                                                                                                                        -->ctx.read();
+                                                                                                                            -->next.invokeRead();
+                                                                                                                                -->((ChannelOutboundHandler) handler()).read(this);
+                                                                                                                                    -->unsafe.beginRead();
+                                                                                                                                        -->doBeginRead();
+                                                                                                                                            -->super.doBeginRead();
+                                                                                                                                            protected void doBeginRead() throws Exception {
+                                                                                                                                                // 拿到SelectionKey
+                                                                                                                                                final SelectionKey selectionKey = this.selectionKey;
+                                                                                                                                                if (!selectionKey.isValid()) {
+                                                                                                                                                    return;
+                                                                                                                                                }
+                                                                                                                                        
+                                                                                                                                                readPending = true;
+                                                                                                                                                // 获取感兴趣的事件，channel注册的时候没有注册任何事件，所以此处是0
+                                                                                                                                                final int interestOps = selectionKey.interestOps();
+                                                                                                                                                // 判断是不是对任何事件都不监听
+                                                                                                                                                if ((interestOps & readInterestOp) == 0) {
+                                                                                                                                                    // 此条件成立，将之前的accept(16)事件注册, readInterest代表可以读取一个新连接的意思
+                                                                                                                                                    // 注册完accept事件之后, 就可以轮询selector, 监听是否有新连接接入了 
+                                                                                                                                                    selectionKey.interestOps(interestOps | readInterestOp);
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                            
+                                                                                            
+                                                                                
+                                                                    
+                                                        
+                                
 ```
