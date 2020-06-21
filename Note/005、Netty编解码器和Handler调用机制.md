@@ -77,3 +77,9 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
 4、HttpObjectDecoder：一个HTTP数据的解码器。
 5、LengthFieldBasedFrameDecoder：通过指定长度来标识整包消息，这样就可以自动的处理黏包和半包消息。
 ```
+### 出站
+```text
+以客户端为基准：
+客户端向服务器端writeAndFlush数据时，即为出站 outBound  出站就需要编码
+客户端读取服务器端发送过来的数据ChannelRead时，即为入站 inBound 入站就需要解码
+```
