@@ -14,9 +14,9 @@ public class NewIOClient {
 
         String fileName = "D:\\DevCache\\CodeDev\\netty\\netty-nio\\XunLeiWebSetup11.3.13.1940xl11.exe";
 
-        FileChannel fileChannel = new FileInputStream(fileName).getChannel();   
+        FileChannel fileChannel = new FileInputStream(fileName).getChannel();
 
-        long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();    
 
         long transferCount = fileChannel.transferTo(0, fileChannel.size(), socketChannel);
 
