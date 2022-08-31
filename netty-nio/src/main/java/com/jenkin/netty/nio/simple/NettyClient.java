@@ -17,7 +17,7 @@ public class NettyClient {
             // 2、创建客户端启动对象，注意客户端使用的不是ServerBootstrap而是Bootstrap
             Bootstrap bootstrap = new Bootstrap();
             // 3、设置相关参数
-            bootstrap.group(eventLoopGroup)// 设置线程数
+            bootstrap.group(eventLoopGroup)// 设置线程组
                     .channel(NioSocketChannel.class)// 设置客户端通道的实现类
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -28,7 +28,7 @@ public class NettyClient {
             System.out.println("------客户端已经准备好了----------");
             // 4、启动客户端，去连接服务器端 sync让方法不阻塞。
             ChannelFuture cf = bootstrap.connect("127.0.0.1", 6668).sync();
-            // 5、给关闭通道进行监听
+            // 5、给关闭通道进行监听 sync()非阻塞的
             cf.channel().closeFuture().sync();
         } finally {
             eventLoopGroup.shutdownGracefully();

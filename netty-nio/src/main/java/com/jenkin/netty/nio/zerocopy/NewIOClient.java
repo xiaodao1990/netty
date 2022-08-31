@@ -16,7 +16,7 @@ public class NewIOClient {
 
         FileChannel fileChannel = new FileInputStream(fileName).getChannel();
 
-        long startTime = System.currentTimeMillis();    
+        long startTime = System.currentTimeMillis();
 
         long transferCount = fileChannel.transferTo(0, fileChannel.size(), socketChannel);
 
