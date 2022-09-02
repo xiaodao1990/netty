@@ -46,6 +46,7 @@ public class NettyServer {
             // 绑定一个端口并且同步，生成一个ChannelFuture对象
             // 启动服务器(并绑定端口)
             ChannelFuture future = bootstrap.bind(6668);// 异步执行
+            System.out.println("--------服务器 bind port incomplete------");
             ChannelFuture cf   = future.sync();// 等待异步执行的结果【将异步转同步】
             System.out.println("--------服务器 bind port success-------");
             // 对关闭通道进行监听

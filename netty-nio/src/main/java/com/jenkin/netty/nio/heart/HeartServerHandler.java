@@ -4,6 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.time.LocalDateTime;
+
 public class HeartServerHandler extends ChannelInboundHandlerAdapter {
 
     /**
@@ -27,7 +29,7 @@ public class HeartServerHandler extends ChannelInboundHandlerAdapter {
                     eventType = "读写空闲";
                     break;
             }
-            System.out.println(ctx.channel().remoteAddress()+"-----超时事件--"+eventType);
+            System.out.println(LocalDateTime.now() + ": " + ctx.channel().remoteAddress()+"-----超时事件--"+eventType);
             System.out.println("服务器做出相应的处理");
             // 如果发生空闲，我们就关闭通道
             // ctx.channel().close();

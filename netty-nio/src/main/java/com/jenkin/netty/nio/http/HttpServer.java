@@ -15,7 +15,6 @@ public class HttpServer {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .handler(new HttpServerInitializer())
                     .childHandler(new HttpServerInitializer());
 
             ChannelFuture cf = bootstrap.bind(6668).sync();
