@@ -1,4 +1,4 @@
-package com.jenkin.netty.nio.tcp1;
+package com.jenkin.netty.nio.protocoltcp;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -22,6 +22,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<MessageProto
             messageProtocol.setContent(content);
             ctx.writeAndFlush(messageProtocol);
         }
+        System.out.println();
     }
 
     @Override

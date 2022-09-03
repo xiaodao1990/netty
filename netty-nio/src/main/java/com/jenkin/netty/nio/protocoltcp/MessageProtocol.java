@@ -1,4 +1,4 @@
-package com.jenkin.netty.nio.tcp1;
+package com.jenkin.netty.nio.protocoltcp;
 
 /**
  * 要求客户端发送5个Message对象，客户端每次发送一个Message对象

@@ -1,4 +1,4 @@
-package com.jenkin.netty.nio.tcp1;
+package com.jenkin.netty.nio.protocoltcp;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -20,6 +20,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<MessageProto
         System.out.println("长度="+len);
         System.out.println("内容="+new String(content, CharsetUtil.UTF_8));
         System.out.println("服务器接收到消息包数量="+(++count));
+        System.out.println();
 
         // 回复消息
         String responseContent = UUID.randomUUID().toString();

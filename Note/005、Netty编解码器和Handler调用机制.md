@@ -53,8 +53,9 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
 ### Netty的Handler链的调用机制
 ```text
 案例说明：
-1) 使用自定义的编码器和解码器来说明Netty的handler 调用机制
-    客户端发送long -> 服务器服务端发送long -> 客户端
+1) 使用自定义的编码器和解码器来说明Netty的handler调用机制
+    客户端发送long -> 服务器
+    服务端发送long -> 客户端
 2) 结论：
     不论解码器Handler还是编码器Handler，接收的消息类型必须与待处理的消息类型一致，否则该Handler不会被执行。
     在解码器进行数据解码时，需要判断缓存去(Bytebuf)的数据是否足够，否则接收到的结果会跟期望的结果不一致。
@@ -72,14 +73,21 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
     1) public abstract class ReplayingDecoder<S> extends ByteToMessageDecoder
     2) ReplayingDecoder扩展了ByteToMessageDecoder类，使用这个类，我们不必调用readableBytes()方法。参数S指定了
     用户状态管理的类型，其中Void代表不需要状态管理。
+    3) ReplayingDecoder不需要判断数据是否足够读取，内部会进行处理。
+    4) ReplayingDecoder使用方便，但它也有一些局限性。
+    	a、并不是所有的ByteBuf操作都被支持，如果调用了一个不被支持的方法，将会抛出一个UnsupportedOperationException。
+    	b、ReplayingDecoder在某些情况下可能稍慢于ByteToMessageDecoder，例如网络缓慢并且消息格式复杂时，消息会被拆成了多个碎片，速度变慢。
 2、LineBasedFrameDecoder：这个类在Netty内部也有使用，它使用行尾控制字符（\n或者\r\n）作为分隔符来解析数据。
 3、DelimiterBasedFrameDecoder：使用自定义的特殊字符作为消息的分隔符。
 4、HttpObjectDecoder：一个HTTP数据的解码器。
 5、LengthFieldBasedFrameDecoder：通过指定长度来标识整包消息，这样就可以自动的处理黏包和半包消息。
 ```
-### 出站
+### 其他编码器
+
+### 出站与入站理解
+
 ```text
 以客户端为基准：
-客户端向服务器端writeAndFlush数据时，即为出站 outBound  出站就需要编码
-客户端读取服务器端发送过来的数据ChannelRead时，即为入站 inBound 入站就需要解码
+客户端向服务器端writeAndFlush数据时，即为出站outBound，出站就需要编码。
+客户端读取服务器端发送过来的数据ChannelRead时，即为入站inBound，入站就需要解码。
 ```

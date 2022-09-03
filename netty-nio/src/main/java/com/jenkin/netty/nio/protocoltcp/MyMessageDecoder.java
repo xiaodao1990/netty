@@ -1,4 +1,4 @@
-package com.jenkin.netty.nio.tcp1;
+package com.jenkin.netty.nio.protocoltcp;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
