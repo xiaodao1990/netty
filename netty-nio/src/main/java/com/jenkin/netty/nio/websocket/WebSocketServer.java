@@ -54,7 +54,7 @@ public class WebSocketServer {
                              * 2、可以看到WebSocketFrame下面有6个子类
                              * 3、浏览器请求时ws://localhost:6889/hello表示请求uri
                              * 4、WebSocketServerProtocolHandler核心功能是将http协议升级为ws协议，保持长连接
-                             * 5、是通过一个状态码101
+                             * 5、是通过一个状态码101进行协议升级的
                              */
                             pipeline.addLast(new WebSocketServerProtocolHandler("/hello"));
                             // 自定义handler，处理业务逻辑

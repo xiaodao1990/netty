@@ -50,7 +50,7 @@ public class GroupChatServer {
                             SocketChannel socketChannel = listenChannel.accept();
                             socketChannel.configureBlocking(false);
                             socketChannel.register(selector, SelectionKey.OP_READ);
-                            System.out.println(socketChannel.getRemoteAddress() + "上线了");
+                            System.out.println(socketChannel.getRemoteAddress() + "上线了, SocketChannel: " + socketChannel + ", hashCode: "+socketChannel.hashCode());
                         }
                         if (key.isReadable()) {
                             readDate(key);

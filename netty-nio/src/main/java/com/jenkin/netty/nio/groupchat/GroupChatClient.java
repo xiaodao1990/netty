@@ -27,7 +27,7 @@ public class GroupChatClient {
             socketChannel.register(selector, SelectionKey.OP_READ);
             // 得到username
             username = socketChannel.getLocalAddress().toString().substring(1);
-            System.out.println(username + " is ok...");
+            System.out.println(username + " is ok...socketChannel: "+ socketChannel + ", hashCode: "+socketChannel.hashCode());
         } catch (Exception e) {
             e.printStackTrace();
         }
