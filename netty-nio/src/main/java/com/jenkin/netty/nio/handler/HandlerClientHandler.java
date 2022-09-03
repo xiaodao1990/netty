@@ -20,7 +20,6 @@ public class HandlerClientHandler extends SimpleChannelInboundHandler<Long> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Long msg) throws Exception {
-        System.out.println("服务器的IP="+ctx.channel().remoteAddress());
-        System.out.println("收到服务器消息="+msg);
+        System.out.println("从服务器的IP="+ctx.channel().remoteAddress() + "收到服务器消息="+msg);
     }
 }

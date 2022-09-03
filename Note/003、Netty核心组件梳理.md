@@ -157,8 +157,7 @@ Channel中各个的ChannelHandler如何相互交互。
 3) 常用的方法
     ChannelFuture close()，关闭通道
     ChannelOutboundInvoker flush()，刷新
-    ChannelFuture writeAndFlush(Object msg) ， 将数据写到ChannelPipeline中当前ChannelHandler
-    的下一个ChannelHandler开始处理(出站)
+    ChannelFuture writeAndFlush(Object msg) ， 将数据写到ChannelPipeline中当前ChannelHandler的下一个ChannelHandler开始处理(出站)
 ```
 ### ChannelOption
 ```text

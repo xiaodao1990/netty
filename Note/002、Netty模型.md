@@ -159,8 +159,16 @@ Future-Listener机制
         线程阻塞，线程在 I/O 操作期间可以执行别的程序，在高并发情形下会更稳定和更高的吞吐量
 ```
 
-#### PS
+# netty 中 ChannelFuture.sync () 的作用是什么？
 
-># netty 中 ChannelFuture.sync () 的作用是什么？
->
 >https://gorden5566.com/post/1066.html
+
+sync()将异步执行转同步。
+
+![avatar](./pic/049_netty.png)
+
+![avatar](./pic/050_netty.png)
+
+![avatar](./pic/051_netty.png)
+
+![avatar](./pic/052_netty.png)

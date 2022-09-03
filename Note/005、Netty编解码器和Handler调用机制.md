@@ -60,7 +60,7 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
     在解码器进行数据解码时，需要判断缓存去(Bytebuf)的数据是否足够，否则接收到的结果会跟期望的结果不一致。
 
 ```
-![avatar](./pic/035_netty.png)
+![avatar](./pic/035_netty.png) 
 ![avatar](./pic/036_netty.png)
 ![avatar](./pic/037_netty.png)    
 ![avatar](./pic/038_netty.png)    
