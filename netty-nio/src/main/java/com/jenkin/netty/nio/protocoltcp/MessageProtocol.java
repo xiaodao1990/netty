@@ -7,7 +7,7 @@ package com.jenkin.netty.nio.protocoltcp;
  */
 public class MessageProtocol {
 
-    private int len;// 关键
+    private int len;// 关键 解决服务器端每次读取数据长度的问题
     private byte[] content;
 
     public int getLen() {
