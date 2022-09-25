@@ -1,63 +1,30 @@
 package com.jenkin.netty.nio.performance;
 
 import io.netty.util.concurrent.FastThreadLocal;
+import io.netty.util.concurrent.FastThreadLocalThread;
 
 /**
  * Created by someone on 2022/9/9 16:20.
  */
 public class FastThreadLocalDemo {
 
-    final class FastThreadLocalTest extends FastThreadLocal<Object> {
 
-        @Override
-        protected Object initialValue() throws Exception {
-            return new Object();
-        }
-    }
-
-    private final FastThreadLocalTest fastThreadLocalTest;
-
-    public FastThreadLocalDemo() {
-        fastThreadLocalTest = new FastThreadLocalTest();
-    }
+    private static FastThreadLocal<String> threadLocal0 = new FastThreadLocal<>();
+    private static FastThreadLocal<String> threadLocal1 = new FastThreadLocal<>();
 
     public static void main(String[] args) {
-        FastThreadLocalDemo threadLocalDemo0 = new FastThreadLocalDemo();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Object o = threadLocalDemo0.fastThreadLocalTest.get();
-                String name = Thread.currentThread().getName();
-                try {
-                    for (int i = 0; i < 10; i++) {
-                        Object value = new Object();
-                        threadLocalDemo0.fastThreadLocalTest.set(value);
-                        System.out.println(name + ": o " + o + ", tmpO "+value);
-                        Thread.sleep(1000);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        for (int i = 0; i < 1; i++) {
+            int finalI = i;
+            new FastThreadLocalThread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println(threadLocal0.get());
+                    threadLocal0.set("线程" + finalI + "的数据0");
+                    threadLocal1.set("线程" + finalI + "的数据1");
+                    System.out.println("threadLocal0 " + threadLocal0.get());
+                    System.out.println("threadLocal1 " + threadLocal1.get());
                 }
-            }
-        }).start();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Object obj = threadLocalDemo0.fastThreadLocalTest.get();
-                String name = Thread.currentThread().getName();
-                System.out.println(name + ": o " + obj);
-                try {
-                    for (int i = 0; i < 10; i++) {
-                        System.out.println(obj == threadLocalDemo0.fastThreadLocalTest.get());
-                        Thread.sleep(1000);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
+            }, "FastThreadLocalThread" + i).start();
+        }
     }
 }
